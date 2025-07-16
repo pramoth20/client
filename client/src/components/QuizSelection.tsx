@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import VideoPlayer from './VideoPlayer';
 import Quiz from './Quiz';
+import IntroForm from './IntroForm';
 
 interface QuizSelectionProps {
     onQuizComplete: (quizId: string, results: any) => void;
@@ -8,8 +9,15 @@ interface QuizSelectionProps {
 
 const QuizSelection: React.FC<QuizSelectionProps> = ({ onQuizComplete }) => {
     const [activeTab, setActiveTab] = useState<'quiz1' | 'quiz2'>('quiz1');
+    const [introCompleted, setIntroCompleted] = useState(false);
     const [videoCompleted, setVideoCompleted] = useState(false);
     const [quiz1Completed, setQuiz1Completed] = useState(false);
+    const [introData, setIntroData] = useState<any>(null);
+
+    const handleIntroComplete = (data: any) => {
+        setIntroData(data);
+        setIntroCompleted(true);
+    };
 
     const handleVideoComplete = () => {
         setVideoCompleted(true);
@@ -17,7 +25,7 @@ const QuizSelection: React.FC<QuizSelectionProps> = ({ onQuizComplete }) => {
 
     const handleQuiz1Complete = (results: any) => {
         setQuiz1Completed(true);
-        onQuizComplete('quiz1', results);
+        onQuizComplete('quiz1', { ...results, introData });
     };
 
     return (
@@ -27,7 +35,7 @@ const QuizSelection: React.FC<QuizSelectionProps> = ({ onQuizComplete }) => {
                     className={`tab ${activeTab === 'quiz1' ? 'active' : ''}`}
                     onClick={() => setActiveTab('quiz1')}
                 >
-                    Quiz 1
+                    Development of the Anterior Cruciate Ligament
                 </button>
                 <button
                     className={`tab ${activeTab === 'quiz2' ? 'active' : ''}`}
@@ -41,7 +49,9 @@ const QuizSelection: React.FC<QuizSelectionProps> = ({ onQuizComplete }) => {
             <div className="content">
                 {activeTab === 'quiz1' && (
                     <div className="quiz-module">
-                        {!videoCompleted ? (
+                        {!introCompleted ? (
+                            <IntroForm onComplete={handleIntroComplete} />
+                        ) : !videoCompleted ? (
                             <VideoPlayer onComplete={handleVideoComplete} />
                         ) : (
                             <Quiz
